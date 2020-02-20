@@ -1,23 +1,12 @@
 import {
-  call, put, spawn, takeLatest,
+  call, put, select, spawn, takeLatest,
 } from 'redux-saga/effects';
-import {
-  FETCH_FILTER_GENRES_REQUEST,
-  FETCH_FILTER_SEARCH_REQUEST,
-  FETCH_SEARCH_REQUEST,
-  FETCH_SIDEBAR_REQUEST,
-} from '../actions/actionTypes';
+import { DO_SEARCH, FETCH_FILTER_GENRES_REQUEST, FETCH_SIDEBAR_REQUEST } from '../actions/actionTypes';
 import {
   fetchFilterMovies, fetchGenres, fetchSearch, fetchSidebarMovie,
 } from '../api';
 import { fetchFilterGenresFailure, fetchFilterGenresSuccess } from '../actions/filterActions';
-import {
-  fetchFilterSearchFailure,
-  fetchFilterSearchSuccess,
-  fetchSearchFailure,
-  fetchSearchSuccess,
-  setFilterParams,
-} from '../actions/searchActions';
+import { fetchFilterSearchFailure, fetchFilterSearchRequest, fetchFilterSearchSuccess } from '../actions/searchActions';
 import { fetchSidebarFailure, fetchSidebarSuccess } from '../actions/sidebarActions';
 
 function* handleFilterGenresSaga() {
@@ -33,24 +22,7 @@ function* watchFilterGenresSaga() {
   yield takeLatest(FETCH_FILTER_GENRES_REQUEST, handleFilterGenresSaga);
 }
 
-function* handleFilterSearchSaga({ payload: { params }, history }) {
-  console.log(params);
-  try {
-    const movies = yield call(fetchFilterMovies, params);
-    yield put(fetchFilterSearchSuccess(movies.results));
-    yield put(setFilterParams(params));
-    yield call(() => history.push('/search'));
-  } catch (e) {
-    yield put(fetchFilterSearchFailure(e.message));
-  }
-}
-
-function* watchFilterSearchSaga() {
-  yield takeLatest(FETCH_FILTER_SEARCH_REQUEST, handleFilterSearchSaga);
-}
-
 function* handleSidebarMovieSaga({ payload }) {
-  console.log(payload);
   try {
     const movie = yield call(fetchSidebarMovie, payload.id);
     yield put(fetchSidebarSuccess(movie));
@@ -63,48 +35,35 @@ function* watchSidebarMovieSaga() {
   yield takeLatest(FETCH_SIDEBAR_REQUEST, handleSidebarMovieSaga);
 }
 
-function* handleSearchSaga({ payload, history }) {
-  console.log(payload);
+function* handleDoSearchSaga({ history }) {
+  const {
+    currentFetchType, filterParams, searchQuery, page,
+  } = yield select((state) => state.search);
+
   try {
-    const movies = yield call(fetchSearch, payload.query);
-    yield put(fetchSearchSuccess(movies.results));
+    yield put(fetchFilterSearchRequest());
+    const movies = currentFetchType === 'filter'
+      ? yield call(fetchFilterMovies, {
+        ...filterParams,
+        page,
+      })
+      : yield call(fetchSearch, {
+        query: searchQuery,
+        page,
+      });
+    yield put(fetchFilterSearchSuccess(movies.results, movies.total_pages));
     yield call(() => history.push('/search'));
   } catch (e) {
-    yield put(fetchSearchFailure(e.message));
+    yield put(fetchFilterSearchFailure(e.message));
   }
 }
 
-function* watchSearchSaga() {
-  yield takeLatest(FETCH_SEARCH_REQUEST, handleSearchSaga);
+function* watchDoSearchSaga() {
+  yield takeLatest(DO_SEARCH, handleDoSearchSaga);
 }
-
-// function* handleSetFilterParamsSaga() {
-//   yield put(doSearchFetch);
-// }
-//
-// function* watchSetFilterParamsSaga() {
-//   yield takeLatest(SET_FILTER_PARAMS, handleSetFilterParamsSaga);
-// }
-//
-// function* handleDoSearchSaga() {
-//   try {
-//     const movies = yield call(fetchFilterMovies, params);
-//     yield put(fetchFilterSearchSuccess(movies.results));
-//     yield put(setFilterParams(params));
-//     yield call(() => history.push('/search'));
-//   } catch (e) {
-//     yield put(fetchFilterSearchFailure(e.message));
-//   }
-// }
-//
-// function* watchDoSearchSaga() {
-//   yield takeLatest(DO_SEARCH, handleDoSearchSaga);
-// }
 
 export default function* saga() {
   yield spawn(watchFilterGenresSaga);
-  yield spawn(watchFilterSearchSaga);
   yield spawn(watchSidebarMovieSaga);
-  yield spawn(watchSearchSaga);
-  // yield spawn(watchSetFilterParamsSaga);
+  yield spawn(watchDoSearchSaga);
 }

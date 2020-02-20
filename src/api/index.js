@@ -11,8 +11,9 @@ export const fetchGenres = async () => {
 };
 
 export const fetchFilterMovies = async ({
-  genre, yearFrom, yearTo, ratingFrom, ratingTo,
+  genre, yearFrom, yearTo, ratingFrom, ratingTo, page,
 }) => {
+  console.log(page);
   const urlParams = {
     with_genres: genre || '',
     'primary_release_date.gte': yearFrom ? `${yearFrom}-01-01` : '',
@@ -20,6 +21,7 @@ export const fetchFilterMovies = async ({
     'vote_average.gte': ratingFrom || '',
     'vote_average.lte': ratingTo || '',
     sort_by: 'primary_release_date.desc',
+    page,
   };
   const response = await fetch(`${createApiUrl('/discover/movie', urlParams)}`);
   if (!response.ok) {
@@ -42,9 +44,8 @@ export const fetchSidebarMovie = async (movieId) => {
   return responseJson;
 };
 
-export const fetchSearch = async (query) => {
-  console.log(query);
-  const response = await fetch(`${createApiUrl('/search/movie', { query })}`);
+export const fetchSearch = async (urlParams) => {
+  const response = await fetch(`${createApiUrl('/search/movie', urlParams)}`);
   if (!response.ok) {
     throw new Error(response.statusText);
   }

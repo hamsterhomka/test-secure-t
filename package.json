@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@babel/polyfill": "^7.8.3",
     "bootstrap": "^4.4.1",
     "classnames": "^2.2.6",
     "prop-types": "^15.7.2",

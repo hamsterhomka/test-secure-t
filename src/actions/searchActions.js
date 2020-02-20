@@ -7,10 +7,8 @@ import {
   FETCH_SEARCH_REQUEST, FETCH_SEARCH_SUCCESS, SET_FILTER_PARAMS, SET_PAGE, SET_SEARCH_QUERY,
 } from './actionTypes';
 
-export const fetchFilterSearchRequest = (params, history) => ({
+export const fetchFilterSearchRequest = () => ({
   type: FETCH_FILTER_SEARCH_REQUEST,
-  payload: { params },
-  history,
 });
 
 export const fetchFilterSearchFailure = (error) => ({
@@ -18,9 +16,9 @@ export const fetchFilterSearchFailure = (error) => ({
   payload: { error },
 });
 
-export const fetchFilterSearchSuccess = (movies) => ({
+export const fetchFilterSearchSuccess = (movies, totalPages) => ({
   type: FETCH_FILTER_SEARCH_SUCCESS,
-  payload: { movies },
+  payload: { movies, totalPages },
 });
 
 export const fetchSearchRequest = (query, history) => ({
@@ -34,9 +32,9 @@ export const fetchSearchFailure = (error) => ({
   payload: { error },
 });
 
-export const fetchSearchSuccess = (movies) => ({
+export const fetchSearchSuccess = (movies, totalPages) => ({
   type: FETCH_SEARCH_SUCCESS,
-  payload: { movies },
+  payload: { movies, totalPages },
 });
 
 export const setPage = (page) => ({
@@ -44,8 +42,9 @@ export const setPage = (page) => ({
   payload: { page },
 });
 
-export const doSearchFetch = () => ({
+export const doSearchFetch = (history) => ({
   type: DO_SEARCH,
+  history,
 });
 
 export const setFilterParams = (params) => ({
