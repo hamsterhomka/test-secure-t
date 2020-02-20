@@ -1,0 +1,34 @@
+.Search {
+  &__card-row {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &__content {
+    overflow: auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  &__card {
+    width: 100%;
+    margin-top: 20px;
+  }
+
+  &__left {
+    width: 900px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__content-wrapper {
+    display: flex;
+    height: 100vh;
+  }
+
+  &__sidebar {
+    width: 300px;
+  }
+}

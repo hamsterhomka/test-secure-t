@@ -1,0 +1,13 @@
+.MainPage {
+  height: 100vh;
+
+  & .PageContainer {
+    height: 100%;
+  }
+
+  &__filter-panel {
+    position: relative;
+    top: 50%;
+    transform: translate(0, -50%);
+  }
+}
